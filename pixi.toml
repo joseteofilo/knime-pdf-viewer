@@ -1,0 +1,39 @@
+[workspace]
+authors = ["Jose Teofilo"]
+channels = ["knime", "conda-forge"]
+description = "PDF Viewer node for KNIME"
+name = "knime-pdf-viewer"
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+test = { cmd = "pytest" }
+format = { cmd = "ruff format ." }
+
+[dependencies]
+python = "3.13.*"
+pytest = "*"
+ruff = "*"
+knime-extension = "*"
+knime-python-base = "*"
+knime-python-versions = "5.*"
+
+[pypi-dependencies]
+pymupdf = ">=1.24"
+
+[feature.build.dependencies]
+python = "3.9.*"
+knime-extension-bundling = "5.*"
+
+[feature.debug.dependencies]
+debugpy = "*"
+
+[feature.build.tasks]
+build = { args = [{ "arg" = "dest", "default" = "./local-update-site" }], cmd = "build-python-extension . {{ dest }} --update-sites-version nightly"}
+register-debug-in-knime = { description = "Register the current KNIME extension with a KNIME installation. Usage: 'pixi run register-debug-in-knime' (default locations) or 'pixi run register-debug-in-knime <path>' (search entire path if no executables found). Note windows paths should not end with \\ (backslash)", args = [
+                { "arg" = "search_path", "default" = "" }], cmd = "register-debug-in-knime{% if search_path %} --search-path \"{{ search_path }}\"{% endif %}" }
+
+
+[environments]
+build = {features = ["build"], no-default-feature = true}
+debug = {features = ["debug"]}

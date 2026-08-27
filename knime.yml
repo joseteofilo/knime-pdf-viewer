@@ -1,0 +1,9 @@
+name: pdf_viewer
+group_id: io.github.joseteofilo
+description: PDF Viewer node for KNIME
+long_description: Visualizes PDF documents inside KNIME with page navigation, zoom and full-text search, similar to a desktop PDF reader. Accepts a single PDF file or a folder of PDFs with dialog-driven file selection via flow variable.
+version: 0.1.0
+author: Jose Teofilo
+vendor: Jose Teofilo
+pixi_toml_path: pixi.toml
+extension_module: ./src/extension

@@ -1,0 +1,9 @@
+# Copy this file to config.yml and replace <path-to-this-repo> with the
+# absolute path to this repository on your machine, then register the
+# extension for debugging in KNIME (see README). config.yml is machine-specific
+# and is gitignored.
+
+io.github.joseteofilo.pdf_viewer:
+  src: <path-to-this-repo>
+  conda_env_path: <path-to-this-repo>/.pixi/envs/default
+  debug_mode: true
