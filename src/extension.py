@@ -5,13 +5,9 @@ from collections import OrderedDict
 from pathlib import Path
 
 import knime.extension as knext
+import pymupdf
 
 LOGGER = logging.getLogger(__name__)
-
-try:
-    import pymupdf
-except ImportError:
-    import fitz as pymupdf
 
 
 def extract_page_data(page, dpi: int, jpeg_quality: int) -> dict:
@@ -22,7 +18,10 @@ def extract_page_data(page, dpi: int, jpeg_quality: int) -> dict:
 
     try:
         words = page.get_text("words") or []
-    except Exception:
+    except (RuntimeError, ValueError) as e:
+        # MuPDF can raise while extracting text from corrupt/odd pages;
+        # degrade to a scanned page (no text layer) instead of failing.
+        LOGGER.debug("PDF Viewer: text extraction failed on page: %s", e)
         words = []
 
     groups = OrderedDict()
@@ -497,8 +496,10 @@ class PdfViewerNode:
         try:
             data_area = Path(ctx.get_workflow_data_area_dir())
             candidates.extend([data_area.parent / raw, data_area / raw])
-        except Exception:
-            pass
+        except (AttributeError, TypeError, RuntimeError, NotImplementedError) as e:
+            # Context may lack the workflow data area (e.g. older KNIME or
+            # non-execution contexts); fall back to cwd-relative resolution.
+            LOGGER.debug("PDF Viewer: no workflow data area available: %s", e)
         candidates.append(Path.cwd() / raw)
         for c in candidates:
             if c.exists():

@@ -12,10 +12,17 @@ def make_pdf(path, pages=3, password=None):
     for i in range(pages):
         page = doc.new_page(width=595, height=842)
         page.insert_text((72, 90), f"Sample Invoice {i + 1}", fontsize=16)
-        page.insert_text((72, 120), "Invoice total 1234 EUR payable within 30 days", fontsize=11)
+        page.insert_text(
+            (72, 120), "Invoice total 1234 EUR payable within 30 days", fontsize=11
+        )
         page.insert_text((72, 140), f"Page number {i + 1} of {pages}", fontsize=11)
     if password:
-        doc.save(path, encryption=fitz.PDF_ENCRYPT_AES_256, user_pw=password, owner_pw=password)
+        doc.save(
+            path,
+            encryption=fitz.PDF_ENCRYPT_AES_256,
+            user_pw=password,
+            owner_pw=password,
+        )
     else:
         doc.save(path)
     doc.close()
@@ -78,10 +85,14 @@ def test_build_viewer_html_roundtrip(tmp_path):
     pdf = tmp_path / "sample.pdf"
     make_pdf(pdf, pages=2)
     doc = fitz.open(pdf)
-    pages = [ext.extract_page_data(doc[i], dpi=72, jpeg_quality=60) for i in range(len(doc))]
+    pages = [
+        ext.extract_page_data(doc[i], dpi=72, jpeg_quality=60) for i in range(len(doc))
+    ]
     doc.close()
 
-    html = ext.build_viewer_html({"title": "sample.pdf", "documents": [{"name": "sample.pdf", "pages": pages}]})
+    html = ext.build_viewer_html(
+        {"title": "sample.pdf", "documents": [{"name": "sample.pdf", "pages": pages}]}
+    )
     assert html.startswith("<!DOCTYPE html>")
     assert "__PAYLOAD__" not in html
     assert 'id="pdf-data"' in html
@@ -101,7 +112,10 @@ def test_script_tag_injection_is_neutralized(tmp_path):
     pages = [ext.extract_page_data(doc[0], dpi=72, jpeg_quality=60)]
     doc.close()
 
-    evil = {"title": 'a</script><img src=x onerror=alert(1)>', "documents": [{"name": "x", "pages": pages}]}
+    evil = {
+        "title": "a</script><img src=x onerror=alert(1)>",
+        "documents": [{"name": "x", "pages": pages}],
+    }
     html = ext.build_viewer_html(evil)
     payload_region = html.split('id="pdf-data">', 1)[1].split("</script>", 1)[0]
     assert "<script>" not in payload_region
@@ -287,4 +301,7 @@ def test_configure_missing_path_warns(tmp_path):
     ctx = FakeCtx(str(tmp_path / "wf" / "data"))
     node.configure(ctx)
     assert ctx.warnings
-    assert "not found" in ctx.warnings[-1].lower() or "does not exist" in ctx.warnings[-1].lower()
+    assert (
+        "not found" in ctx.warnings[-1].lower()
+        or "does not exist" in ctx.warnings[-1].lower()
+    )
