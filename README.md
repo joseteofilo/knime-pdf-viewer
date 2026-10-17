@@ -58,6 +58,14 @@ For debug registration, add to `knime.ini` (before `-vmargs`):
 
 ## Bundling
 
+A pre-built update site is attached to each [GitHub Release](https://github.com/joseteofilo/knime-pdf-viewer/releases):
+download and unzip `pdf_viewer-<version>-update-site.zip`, then install from
+the unzipped folder via *Help → Install KNIME Extensions* after registering it
+under *Preferences → Install/Update → Available Software Sites → Add * (the
+folder containing `artifacts.jar`/`content.jar`).
+
+To build locally instead (or for pushing to KNIME's Jenkins build):
+
 ```bash
 pixi run build                      # -> ./local-update-site
 # or: pixi run build --dest /some/dir
